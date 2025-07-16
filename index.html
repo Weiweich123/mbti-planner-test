@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>你的企劃MBTI人格是哪一型？</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Noto Sans TC', sans-serif;
+      background: linear-gradient(to right, #eef2f3, #cfd9df);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    #app {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h1 { margin-bottom: 20px; color: #333; }
+    .question { font-weight: 600; margin: 20px 0; font-size: 18px; }
+    .options li {
+      background: #f0f4ff;
+      margin: 10px 0;
+      padding: 12px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      list-style: none;
+    }
+    .options li:hover { background: #dbeafe; }
+    .result-card {
+      display: none;
+      border: 2px dashed #ccc;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+    }
+    .result-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+    .social-icons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .social-icons a {
+      text-decoration: none;
+      font-size: 24px;
+      color: #555;
+    }
+    button {
+      margin-top: 15px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <h1>你的企劃MBTI人格是哪一型？</h1>
+  <div id="quiz"></div>
+  <div id="result" class="result-card">
+    <div class="result-title" id="result-title"></div>
+    <div id="result-desc"></div>
+    <canvas id="captureCanvas" style="display:none;"></canvas>
+    <button onclick="generateImage()">下載結果圖卡</button>
+    <div class="social-icons">
+      <a href="https://www.instagram.com/tbsa.tw/" target="_blank">
+        <img src="free-instagram-icon-CCSHWVW5O8tQ-64x64.png" alt="IG" width="32" height="32">
+      </a>
+      <a href="https://www.facebook.com/tbsaclub" target="_blank">
+        <img src="free-facebook-icon-lIACxOKrLQ1H-64x64.png" alt="IG" width="32" height="32">
+      </a>
+      <a href="https://line.me/R/ti/p/@910vhfhw" target="_blank">
+        <img src="free-line-icon-SsQ1YEm-HU5M-64x64.png" alt="IG" width="32" height="32">
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "Q1：你收到一個超級模糊的企劃 brief，第一反應是？",
+    options: ["F型", "J型", "N型", "P型"]
+  },
+  {
+    q: "Q2：你在團隊中最常被說哪一點？",
+    options: ["F型", "J型", "J型", "F型"]
+  },
+  {
+    q: "Q3：對你來說，企劃最重要的能力是？",
+    options: ["F型", "J型", "N型", "J型"]
+  },
+  {
+    q: "Q4：你最討厭在企劃中遇到什麼事？",
+    options: ["J型", "F型", "F型", "J型"]
+  },
+  {
+    q: "Q5：以下哪句話你最有共鳴？",
+    options: ["F型", "J型", "N型", "J型"]
+  }
+];
+
+const resultMap = {
+  "F型": { mbti: "INFP / ISFP", title: "理想型／感性型企劃人", desc: "情感強、共鳴力強、重視價值與溝通" },
+  "J型": { mbti: "ISTJ / INTJ", title: "戰略型／紀律型企劃人", desc: "邏輯、規劃、條理清晰、穩健執行" },
+  "N型": { mbti: "ENFP / ENTP", title: "靈感型／創造型企劃人", desc: "想像力強、點子多、創新能力強" },
+  "P型": { mbti: "ESTJ / ENTJ", title: "實幹型／指揮型企劃人", desc: "執行力高、主導能力強、快速行動派" }
+};
+
+let currentQ = 0;
+const scores = { F型: 0, J型: 0, N型: 0, P型: 0 };
+const quizEl = document.getElementById("quiz");
+const resultEl = document.getElementById("result");
+
+function showQuestion() {
+  if (currentQ >= questions.length) return showResult();
+  const q = questions[currentQ];
+  let html = `<div class='question'>${q.q}</div><ul class='options'>`;
+  q.options.forEach((type, i) => {
+    const text = questions[currentQ].q.includes("哪句話")
+      ? ["創意沒有對錯，只有會不會動人。","一份好提案，流程與數據才是重點。","點子沒有最多，只有更妙的。","方向對了，再來談創意。"][i]
+      : ["先跟客戶深聊，抓出核心價值！","趕快畫流程圖拆任務，定期程先！","想10種可能方向再慢慢挑選！","我先開PPT，有東西才討論得動。先幹再說"][i];
+    html += `<li onclick="select('${type}')">${text}</li>`;
+  });
+  html += `</ul>`;
+  quizEl.innerHTML = html;
+}
+
+function select(type) {
+  scores[type]++;
+  currentQ++;
+  showQuestion();
+}
+
+function showResult() {
+  quizEl.style.display = "none";
+  resultEl.style.display = "block";
+  const max = Math.max(...Object.values(scores));
+  const top = Object.keys(scores).filter(t => scores[t] === max);
+  const title = top.map(t => resultMap[t].title).join(" + ");
+  const desc = top.map(t => resultMap[t].desc).join("；");
+  document.getElementById("result-title").innerText = `你是 ${title}`;
+  document.getElementById("result-desc").innerText = desc;
+}
+
+function generateImage() {
+  html2canvas(document.getElementById("result"), { scale: 2 }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = '你的企劃腦結果.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+}
+
+showQuestion();
+</script>
+</body>
+</html>
