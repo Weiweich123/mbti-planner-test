@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
+    /* 保留你原本的 CSS */
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -71,27 +72,39 @@
   </style>
 </head>
 <body>
-<div id="app">
-  <h1>你的企劃MBTI人格是哪一型？</h1>
-  <div id="quiz"></div>
-  <div id="result" class="result-card">
-    <div class="result-title" id="result-title"></div>
-    <div id="result-desc"></div>
-    <canvas id="captureCanvas" style="display:none;"></canvas>
-    <button onclick="generateImage()">下載結果圖卡</button>
-    <div class="social-icons">
-      <a href="https://www.instagram.com/tbsa.tw/" target="_blank">
-        <img src="free-instagram-icon-CCSHWVW5O8tQ-64x64.png" alt="IG" width="32" height="32">
-      </a>
-      <a href="https://www.facebook.com/tbsaclub" target="_blank">
-        <img src="free-facebook-icon-lIACxOKrLQ1H-64x64.png" alt="IG" width="32" height="32">
-      </a>
-      <a href="https://line.me/R/ti/p/@910vhfhw" target="_blank">
-        <img src="free-line-icon-SsQ1YEm-HU5M-64x64.png" alt="IG" width="32" height="32">
-      </a>
+<div id="result" class="result-card">
+  <div class="result-title" id="result-title"></div>
+  <div id="result-desc"></div>
+  <canvas id="captureCanvas" style="display:none;"></canvas>
+
+  <button onclick="generateImage()">下載結果圖卡</button>
+
+  <!-- 這裡新增社群分享按鈕區塊 -->
+  <div id="share-section" style="margin-top:20px;">
+    <div>分享到：</div>
+    <div style="margin-top:10px; display:flex; justify-content:center; gap:15px;">
+      <button onclick="shareToFB()" style="padding:8px 12px; border:none; background:#3b5998; color:white; border-radius:6px; cursor:pointer;">Facebook</button>
+      <button onclick="shareToTwitter()" style="padding:8px 12px; border:none; background:#1da1f2; color:white; border-radius:6px; border-radius:6px; cursor:pointer;">Twitter</button>
+      <button onclick="shareToLine()" style="padding:8px 12px; border:none; background:#00c300; color:white; border-radius:6px; cursor:pointer;">Line</button>
+      <button onclick="copyLink()" style="padding:8px 12px; border:none; background:#666; color:white; border-radius:6px; cursor:pointer;">複製分享連結</button>
     </div>
+    <div id="copy-msg" style="color:green; margin-top:8px; display:none;">連結已複製！可以貼到朋友那裡了～</div>
+  </div>
+
+  <!-- 你原本的社群icon連結 -->
+  <div class="social-icons" style="margin-top:20px;">
+    <a href="https://www.instagram.com/tbsa.tw/" target="_blank">
+      <img src="free-instagram-icon-CCSHWVW5O8tQ-64x64.png" alt="IG" width="32" height="32">
+    </a>
+    <a href="https://www.facebook.com/tbsaclub" target="_blank">
+      <img src="free-facebook-icon-lIACxOKrLQ1H-64x64.png" alt="FB" width="32" height="32">
+    </a>
+    <a href="https://line.me/R/ti/p/@910vhfhw" target="_blank">
+      <img src="free-line-icon-SsQ1YEm-HU5M-64x64.png" alt="Line" width="32" height="32">
+    </a>
   </div>
 </div>
+
 
 <script>
 const questions = [
@@ -152,12 +165,20 @@ function select(type) {
 function showResult() {
   quizEl.style.display = "none";
   resultEl.style.display = "block";
-  const max = Math.max(...Object.values(scores));
-  const top = Object.keys(scores).filter(t => scores[t] === max);
-  const title = top.map(t => resultMap[t].title).join(" + ");
-  const desc = top.map(t => resultMap[t].desc).join("；");
-  document.getElementById("result-title").innerText = `你是 ${title}`;
-  document.getElementById("result-desc").innerText = desc;
+
+  const maxScore = Math.max(...Object.values(scores));
+  const topTypes = Object.keys(scores).filter(t => scores[t] === maxScore);
+
+  if (topTypes.length === 1) {
+    // 單一最高分
+    const t = topTypes[0];
+    document.getElementById("result-title").innerText = `你是 ${resultMap[t].title}`;
+    document.getElementById("result-desc").innerText = `${resultMap[t].desc}（MBTI：${resultMap[t].mbti}）`;
+  } else {
+    // 混合型
+    document.getElementById("result-title").innerText = `你是 混合型企劃人（融合多種風格）`;
+    document.getElementById("result-desc").innerText = `你展現多元企劃思維，能靈活結合多種風格，具有強大適應力與創造力。`;
+  }
 }
 
 function generateImage() {
@@ -170,6 +191,42 @@ function generateImage() {
 }
 
 showQuestion();
+
+function getShareText() {
+  const title = document.getElementById("result-title").innerText;
+  const desc = document.getElementById("result-desc").innerText;
+  return encodeURIComponent(`${title}\n${desc}\n\n快來測試你的企劃MBTI人格！`);
+}
+
+function getPageUrl() {
+  return encodeURIComponent(window.location.href);
+}
+
+function shareToFB() {
+  const url = `https://www.facebook.com/sharer/sharer.php?u=${getPageUrl()}`;
+  window.open(url, '_blank');
+}
+
+function shareToTwitter() {
+  const text = getShareText();
+  const url = `https://twitter.com/intent/tweet?text=${text}&url=${getPageUrl()}`;
+  window.open(url, '_blank');
+}
+
+function shareToLine() {
+  const text = getShareText();
+  const url = `https://social-plugins.line.me/lineit/share?url=${getPageUrl()}&text=${text}`;
+  window.open(url, '_blank');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const msg = document.getElementById('copy-msg');
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 2500);
+  });
+}
 </script>
 </body>
 </html>
+
