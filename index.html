@@ -155,16 +155,29 @@ const resultEl = document.getElementById("result");
 function showQuestion() {
   if (currentQ >= questions.length) return showResult();
   const q = questions[currentQ];
+
+  const allOptionsText = [
+    // Q1
+    ["先跟客戶深聊，抓出核心價值！","趕快畫流程圖拆任務，定期程先！","想10種可能方向再慢慢挑選！","我先開PPT，有東西才討論得動。先幹再說"],
+    // Q2
+    ["超有畫面感、但常發散","超冷靜、資料整得一清二楚","提案邏輯超好、但比較硬派","很有溫度、很懂消費者的心"],
+    // Q3
+    ["抓住人的感受與共鳴","把複雜的事說清楚、寫簡報爽感爆棚","提出創新、有梗、有記憶點的想法","把事情規劃、整合、收尾到位"],
+    // Q4
+    ["只想提新點子但都不執行的人","遇到大改版，前面努力都白費","完全沒情感的案子，做得毫無熱情","有人開會聊超遠，完全沒重點"],
+    // Q5
+    ["創意沒有對錯，只有會不會動人。","一份好提案，流程與數據才是重點。","點子沒有最多，只有更妙的。","方向對了，再來談創意。"]
+  ];
+
   let html = `<div class='question'>${q.q}</div><ul class='options'>`;
   q.options.forEach((type, i) => {
-    const text = questions[currentQ].q.includes("哪句話")
-      ? ["創意沒有對錯，只有會不會動人。","一份好提案，流程與數據才是重點。","點子沒有最多，只有更妙的。","方向對了，再來談創意。"][i]
-      : ["先跟客戶深聊，抓出核心價值！","趕快畫流程圖拆任務，定期程先！","想10種可能方向再慢慢挑選！","我先開PPT，有東西才討論得動。先幹再說"][i];
+    const text = allOptionsText[currentQ][i];
     html += `<li onclick="select('${type}')">${text}</li>`;
   });
   html += `</ul>`;
   quizEl.innerHTML = html;
 }
+
 
 function select(type) {
   scores[type]++;
