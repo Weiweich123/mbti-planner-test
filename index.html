@@ -100,7 +100,10 @@
     </div>
 
     <!-- 固定社群Icon連結 -->
-    <div class="social-icons" style="margin-top:20px;">
+    <div style="text-align:center; margin-top:20px; font-weight:bold; font-size:18px; color:#333;">
+      關注我們
+    </div>
+    <div class="social-icons" style="margin-top:10px; display:flex; justify-content:center; gap:15px;">
       <a href="https://www.instagram.com/tbsa.tw/" target="_blank" rel="noopener noreferrer">
         <img src="free-instagram-icon-CCSHWVW5O8tQ-64x64.png" alt="IG" width="32" height="32" />
       </a>
@@ -145,7 +148,7 @@ const resultMap = {
   "F型": { mbti: "INFP / ISFP", title: "理想型／感性型企劃人", desc: "情感強、共鳴力強、重視價值與溝通" },
   "J型": { mbti: "ISTJ / INTJ", title: "戰略型／紀律型企劃人", desc: "邏輯、規劃、條理清晰、穩健執行" },
   "N型": { mbti: "ENFP / ENTP", title: "靈感型／創造型企劃人", desc: "想像力強、點子多、創新能力強" },
-  "P型": { mbti: "ESTJ / ENTJ", title: "實幹型／指揮型企劃人", desc: "執行力高、主導能力強、快速行動派" }
+  "P型": { mbti: "ESTP / ENTJ", title: "實幹型／指揮型企劃人", desc: "執行力高、主導能力強、快速行動派" }
 };
 
 let currentQ = 0;
@@ -160,11 +163,11 @@ function showQuestion() {
   const allOptionsText = [
     // Q1
     ["先跟客戶深聊，抓出核心價值！", "趕快畫流程圖拆任務，定期程先！", "想10種可能方向再慢慢挑選！", "我先開PPT，有東西才討論得動。先幹再說"],
-    // Q2（已調整順序）
+    // Q2
     ["很有溫度、很懂消費者的心", "超冷靜、資料整得一清二楚", "超有畫面感、但常發散", "提案邏輯超好、但比較硬派"],
     // Q3
     ["抓住人的感受與共鳴", "把複雜的事說清楚、寫簡報爽感爆棚", "提出創新、有梗、有記憶點的想法", "把事情規劃、整合、收尾到位"],
-    // Q4（已調整順序）
+    // Q4
     ["完全沒情感的案子，做得毫無熱情", "只想提新點子但都不執行的人", "有人開會聊超遠，完全沒重點", "遇到大改版，前面努力都白費"],
     // Q5
     ["創意沒有對錯，只有會不會動人。", "一份好提案，流程與數據才是重點。", "點子沒有最多，只有更妙的。", "方向對了，再來談創意。"]
@@ -231,7 +234,7 @@ function shareToFB() {
   window.open(url, '_blank');
 }
 
-function shareToTwitter() {
+function shareToX() {
   const text = getShareText();
   const url = `https://twitter.com/intent/tweet?text=${text}&url=${getPageUrl()}`;
   window.open(url, '_blank');
